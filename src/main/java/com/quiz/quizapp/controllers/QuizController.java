@@ -1,43 +1,33 @@
 package com.quiz.quizapp.controllers;
 
 import com.quiz.quizapp.models.Question;
-import com.quiz.quizapp.services.QuestionsService;
+import com.quiz.quizapp.services.QuizService;
+import com.quiz.quizapp.utils.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("quiz")
 public class QuizController {
 
     @Autowired
-    QuestionsService questionsService;
+    QuizService quizService;
 
-    @GetMapping("questions")
-    public List<Question> getAllQuestions() {
-        return questionsService.getAllQuestions();
+    @PostMapping("create")
+    public ResponseEntity<String>createQuiz(@RequestParam String title, @RequestParam String category, @RequestParam int noq){
+        return quizService.createQuiz(title,category, noq);
     }
 
-    @GetMapping("question/{id}")
-    public Optional<Question> getQuestionById(@PathVariable String id){
-        return questionsService.getQuestionById(id);
+    @GetMapping("get/{id}")
+    public ResponseEntity<List<Question>> getQuiz(@PathVariable String id){
+        return quizService.getQuestionsForQuiz(id);
     }
 
-    @GetMapping("question/category/{category}")
-    public List<Question> getByCategory(@PathVariable String category){
-        return questionsService.getByCategory(category);
-    }
-
-    @PostMapping("question/add")
-    public String addQuestion(@RequestBody Question question) {
-        return questionsService.addQuestion(question);
-    }
-
-    @PostMapping("question/remove")
-    public String removeQuestion(@RequestBody Question question){
-        System.out.println("id..........." + question.getId());
-        return questionsService.removeQuestion(question.getId());
+    @PostMapping("submit/{id}")
+    public ResponseEntity<Integer> submitQuiz(@PathVariable String id, @RequestBody List<Response>responses){
+        return quizService.submitQuiz(id, responses);
     }
 }

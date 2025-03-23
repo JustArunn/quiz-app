@@ -3,6 +3,8 @@ package com.quiz.quizapp.services;
 import com.quiz.quizapp.DAO.QuestionDAO;
 import com.quiz.quizapp.models.Question;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,25 +16,29 @@ public class QuestionsService {
     @Autowired
     QuestionDAO questionDAO;
 
-    public List<Question> getAllQuestions() {
-        return questionDAO.findAll();
+    public ResponseEntity<List<Question>> getAllQuestions() {
+        return new ResponseEntity<>(questionDAO.findAll(), HttpStatus.OK);
     }
 
-    public Optional<Question> getQuestionById(String id){
-        return questionDAO.findById(id);
+    public ResponseEntity<Optional<Question>> getQuestionById(String id) {
+        return new ResponseEntity<>(questionDAO.findById(id), HttpStatus.OK);
     }
 
-    public String addQuestion(Question question) {
+    public ResponseEntity<String> addQuestion(Question question) {
+        if (question.getTitle().isEmpty() || question.getDescription().isEmpty() || question.getOption1().isEmpty() || question.getOption2().isEmpty() || question.getOption3().isEmpty() || question.getOption4().isEmpty()) {
+            return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
+        }
+
         questionDAO.save(question);
-        return "success";
+        return new ResponseEntity<>("success", HttpStatus.CREATED);
     }
 
-    public String removeQuestion(String id) {
+    public ResponseEntity<String> removeQuestion(String id) {
         questionDAO.deleteById(id);
-        return "deleted";
+        return new ResponseEntity<>("deleted", HttpStatus.OK);
     }
 
-    public List<Question> getByCategory(String category){
-        return questionDAO.getByCategory(category);
+    public ResponseEntity<List<Question>> getByCategory(String category) {
+        return new ResponseEntity<>(questionDAO.getByCategory(category), HttpStatus.OK);
     }
 }
